@@ -1,33 +1,87 @@
-package com.example.addon;
+package com.example.addon.modules;
 
-import com.example.addon.modules.AutoCraft;
-import com.mojang.logging.LogUtils;
-import meteordevelopment.meteorclient.addons.MeteorAddon;
-import meteordevelopment.meteorclient.systems.modules.Category;
-import meteordevelopment.meteorclient.systems.modules.Modules;
-import org.slf4j.Logger;
+import com.example.addon.Addon;
+import meteordevelopment.meteorclient.events.world.TickEvent;
+import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.item.Items;
+import net.minecraft.item.Item;
 
-public class Addon extends MeteorAddon {
-    public static final Logger LOG = LogUtils.getLogger();
-    public static final Category CATEGORY = new Category("Example");
+public class AutoCraft extends Module {
 
-    @Override
-    public void onInitialize() {
-        LOG.info("Initializing Meteor Addon Template");
+    private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
-        // Đăng ký module AutoCraft vào đây
-        Modules.get().add(new AutoCraft());
+    private final Setting<Item> mineBlock = sgGeneral.add(new ItemSetting.Builder()
+        .name("mine-block")
+        .description("Block to mine")
+        .defaultValue(Items.DIAMOND_ORE)
+        .build()
+    );
 
-        LOG.info("Meteor Addon Template initialized");
+    private final Setting<String> craftCommand = sgGeneral.add(new StringSetting.Builder()
+        .name("craft-command")
+        .description("Craft command")
+        .defaultValue("craft")
+        .build()
+    );
+
+    private final Setting<Integer> craftDelay = sgGeneral.add(new IntSetting.Builder()
+        .name("craft-delay")
+        .description("Delay in ticks")
+        .defaultValue(40)
+        .min(10)
+        .max(200)
+        .build()
+    );
+
+    private int timer = 0;
+    private boolean crafting = false;
+
+    public AutoCraft() {
+        super(Addon.CATEGORY, "auto-craft", "Auto mine and craft for 1.21.11");
     }
 
     @Override
-    public void onRegisterCategories() {
-        Modules.registerCategory(CATEGORY);
+    public void onActivate() {
+        timer = 0;
+        crafting = false;
+        ChatUtils.info("AutoCraft ON - 1.21.11");
     }
 
-    @Override
-    public String getPackage() {
-        return "com.example.addon";
+    @EventHandler
+    private void onTick(TickEvent.Post event) {
+        if (mc.player == null || !mc.player.isAlive()) return;
+
+        timer++;
+
+        if (!crafting) {
+            int filled = 0;
+            for (int i = 0; i < 36; i++) {
+                if (!mc.player.getInventory().getStack(i).isEmpty()) filled++;
+            }
+
+            if (timer % 100 == 0) {
+                ChatUtils.info("Inventory: " + filled + "/36");
+            }
+
+            if (filled >= 35) {
+                crafting = true;
+                timer = 0;
+                ChatUtils.info("Full! Crafting...");
+            }
+        } else {
+            if (timer == 10) {
+                mc.player.networkHandler.sendChatCommand(craftCommand.get());
+                ChatUtils.info("Command: /" + craftCommand.get());
+            }
+
+            if (timer >= craftDelay.get()) {
+                crafting = false;
+                timer = 0;
+                ChatUtils.info("Done!");
+            }
+        }
     }
 }
