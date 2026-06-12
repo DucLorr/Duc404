@@ -3,7 +3,7 @@
   "id": "example-addon",
   "version": "1.0.0",
   "name": "Example Addon",
-  "description": "AutoCraft addon for 1.21.11",
+  "description": "AutoCraft addon for 1.21.4",
   "authors": ["YourName"],
   "entrypoints": {
     "meteor": [
@@ -11,7 +11,7 @@
     ]
   },
   "depends": {
-    "minecraft": "1.21.11",
+    "minecraft": "1.21.4",
     "meteor-client": "*"
   }
 }
