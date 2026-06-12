@@ -13,9 +13,9 @@ public class Addon extends MeteorAddon {
 
     @Override
     public void onInitialize() {
-        LOG.info("Initializing Addon for 1.21.11");
+        LOG.info("Loading Addon for 1.21.4...");
         Modules.get().add(new AutoCraft());
-        LOG.info("AutoCraft loaded!");
+        LOG.info("Addon loaded!");
     }
 
     @Override
