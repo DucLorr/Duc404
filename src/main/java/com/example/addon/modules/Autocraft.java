@@ -40,14 +40,14 @@ public class AutoCraft extends Module {
     private boolean crafting = false;
 
     public AutoCraft() {
-        super(Addon.CATEGORY, "auto-craft", "Auto mine and craft for 1.21.11");
+        super(Addon.CATEGORY, "auto-craft", "Auto mine and craft for 1.21.4");
     }
 
     @Override
     public void onActivate() {
         timer = 0;
         crafting = false;
-        ChatUtils.info("AutoCraft ON - 1.21.11");
+        ChatUtils.info("AutoCraft ON - 1.21.4");
     }
 
     @EventHandler
